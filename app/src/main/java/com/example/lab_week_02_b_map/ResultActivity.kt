@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -33,22 +34,28 @@ class ResultActivity : AppCompatActivity() {
             val backgroundScreen = findViewById<ConstraintLayout>(R.id.background_screen)
             val resultMessage = findViewById<TextView>(R.id.color_code_result_message)
 
-            if (colorCode != null) {
+            if(intent != null){
+                val colorCode = intent.getStringExtra(COLOR_KEY)
+
+                val backgroundScreen = findViewById<ConstraintLayout>(R.id.background_screen)
                 try {
-                    backgroundScreen?.setBackgroundColor(Color.parseColor("#$colorCode"))
-                    resultMessage?.text = getString(R.string.color_code_result_message, colorCode.uppercase())
-                } catch (ex: IllegalArgumentException) {
-                    val errorIntent = Intent()
-                    errorIntent.putExtra(ERROR_KEY, true)
-                    setResult(Activity.RESULT_OK, errorIntent)
-                    finish()
+                    backgroundScreen.setBackgroundColor(Color.parseColor("#$colorCode"))
                 }
-            } else {
-                // Handle kasus jika colorCode null
-                val errorIntent = Intent()
-                errorIntent.putExtra(ERROR_KEY, true)
-                setResult(Activity.RESULT_OK, errorIntent)
-                finish()
+                catch (ex: IllegalArgumentException){
+                    Intent().let{
+                            errorIntent ->
+                        errorIntent.putExtra(ERROR_KEY, true)
+                        setResult(Activity.RESULT_OK, errorIntent)
+                        finish()
+                    }
+                }
+                val resultMessage = findViewById<TextView>(R.id.color_code_result_message)
+                resultMessage.text = getString(R.string.color_code_result_message, colorCode?.uppercase())
+
+                // Handler tombol kembali
+                findViewById<Button>(R.id.back_button).setOnClickListener {
+                    finish()  // Kembali ke MainActivity
+                }
             }
         }
     }
